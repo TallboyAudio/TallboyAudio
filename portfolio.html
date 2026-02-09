@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Name - Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Crimson+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sage: #8B9A7E;
+            --cream: #F4EFE3;
+            --earth: #5C4B3C;
+            --terracotta: #C67B5C;
+            --moss: #6B7C59;
+            --sand: #E8DCC8;
+            --shadow: rgba(92, 75, 60, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: var(--cream);
+            color: var(--earth);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Pixel grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: 1000;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* Ambience Screen */
+        #ambience-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #87CEEB 0%, #F0E68C 50%, #8B9A7E 100%);
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        #ambience-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .ambience-content {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .pixel-clock {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 4rem;
+            color: var(--cream);
+            text-shadow: 
+                4px 4px 0 var(--earth),
+                4px 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 2rem;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .pixel-date {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: var(--sand);
+            text-shadow: 2px 2px 0 var(--earth);
+        }
+
+        .enter-button {
+            margin-top: 3rem;
+            padding: 1rem 2rem;
+            background: var(--terracotta);
+            border: 4px solid var(--earth);
+            color: var(--cream);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 8px 8px 0 var(--earth);
+        }
+
+        .enter-button:hover {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 var(--earth);
+        }
+
+        /* Pixel birds animation */
+        .pixel-bird {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: var(--earth);
+            animation: fly 15s linear infinite;
+            clip-path: polygon(50% 0%, 0% 50%, 25% 50%, 25% 100%, 75% 100%, 75% 50%, 100% 50%);
+        }
+
+        .pixel-bird:nth-child(1) { top: 20%; animation-delay: 0s; }
+        .pixel-bird:nth-child(2) { top: 40%; animation-delay: 5s; }
+        .pixel-bird:nth-child(3) { top: 60%; animation-delay: 10s; }
+
+        @keyframes fly {
+            from { left: -50px; }
+            to { left: 100%; }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        /* Main Content */
+        #main-content {
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, var(--cream) 0%, rgba(244, 239, 227, 0) 100%);
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--earth);
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--moss);
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 1rem;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--terracotta);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--terracotta);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .ambience-toggle {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 2px solid var(--sage);
+            color: var(--sage);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ambience-toggle:hover {
+            background: var(--sage);
+            color: var(--cream);
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 8rem 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-content {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 300;
+            color: var(--earth);
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: var(--terracotta);
+            margin-bottom: 3rem;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--sage);
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        /* About Section */
+        #about {
+            background: var(--sand);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .about-text p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--earth);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            border-left: 4px solid var(--terracotta);
+            padding-left: 1rem;
+        }
+
+        .stat-number {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--terracotta);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--moss);
+            font-size: 0.9rem;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .project-card {
+            background: white;
+            padding: 0;
+            overflow: hidden;
+            transition: transform 0.4s, box-shadow 0.4s;
+            box-shadow: 8px 8px 0 var(--shadow);
+            border: 3px solid var(--earth);
+        }
+
+        .project-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0 var(--shadow);
+        }
+
+        .project-header {
+            background: var(--moss);
+            padding: 1rem;
+            border-bottom: 3px solid var(--earth);
+        }
+
+        .project-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--cream);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: var(--terracotta);
+            color: var(--cream);
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            border: 2px solid var(--earth);
+        }
+
+        .project-body {
+            padding: 2rem;
+        }
+
+        .project-description {
+            color: var(--earth);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .project-link {
+            display: inline-block;
+            color: var(--terracotta);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid var(--terracotta);
+            transition: all 0.3s;
+        }
+
+        .project-link:hover {
+            color: var(--moss);
+            border-color: var(--moss);
+        }
+
+        /* Contact Section */
+        #contact {
+            background: var(--sage);
+        }
+
+        form {
+            display: grid;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--cream);
+            letter-spacing: 1px;
+        }
+
+        input, textarea {
+            padding: 1rem;
+            border: 3px solid var(--earth);
+            background: var(--cream);
+            color: var(--earth);
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--terracotta);
+            box-shadow: 0 0 0 3px rgba(198, 123, 92, 0.2);
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            padding: 1.2rem 3rem;
+            background: var(--terracotta);
+            border: 4px solid var(--earth);
+            color: var(--cream);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 8px 8px 0 var(--earth);
+            justify-self: start;
+        }
+
+        .submit-btn:hover {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 var(--earth);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            background: var(--cream);
+            border: 3px solid var(--earth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--earth);
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            background: var(--terracotta);
+            color: var(--cream);
+            transform: rotate(5deg);
+        }
+
+        footer {
+            background: var(--earth);
+            color: var(--sand);
+            text-align: center;
+            padding: 2rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pixel-clock { font-size: 2rem; }
+            .pixel-date { font-size: 0.7rem; }
+            nav { padding: 1.5rem 2rem; }
+            .nav-links { gap: 1.5rem; font-size: 0.9rem; }
+            section { padding: 6rem 2rem; }
+            h1 { font-size: 3rem; }
+            h2 { font-size: 0.7rem; }
+            .about-content { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+            .projects-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in:nth-child(3) { animation-delay: 0.3s; }
+        .fade-in:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Ambience Screen -->
+    <div id="ambience-screen">
+        <div class="pixel-bird"></div>
+        <div class="pixel-bird"></div>
+        <div class="pixel-bird"></div>
+        <div class="ambience-content">
+            <div class="pixel-clock" id="clock">00:00:00</div>
+            <div class="pixel-date" id="date">Loading...</div>
+            <button class="enter-button" onclick="hideAmbience()">ENTER SITE</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <nav>
+            <div class="logo">YOUR.NAME</div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="ambience-toggle" onclick="showAmbience()">AMBIENCE</button>
+        </nav>
+
+        <!-- Hero Section -->
+        <section id="hero">
+            <div class="section-content">
+                <h1 class="fade-in">Creative<br>Developer</h1>
+                <p class="subtitle fade-in">Crafting digital experiences inspired by nature and nostalgia</p>
+                <h2 class="fade-in">[ PORTFOLIO 2026 ]</h2>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <div class="section-content">
+                <h2>ABOUT_ME.TXT</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p class="fade-in">Hello! I'm a creative professional who finds inspiration in the quiet moments of nature and the pixel-perfect worlds of vintage games.</p>
+                        <p class="fade-in">My work blends thoughtful design with technical craftsmanship, creating experiences that feel both timeless and innovative.</p>
+                        <p class="fade-in">When I'm not coding, you'll find me exploring hiking trails, tending to my garden, or replaying classic JRPGs.</p>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item fade-in">
+                            <span class="stat-number">5+</span>
+                            <span class="stat-label">Years Experience</span>
+                        </div>
+                        <div class="stat-item fade-in">
+                            <span class="stat-number">20+</span>
+                            <span class="stat-label">Projects Completed</span>
+                        </div>
+                        <div class="stat-item fade-in">
+                            <span class="stat-number">∞</span>
+                            <span class="stat-label">Cups of Tea</span>
+                        </div>
+                        <div class="stat-item fade-in">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Passion</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects">
+            <div class="section-content">
+                <h2>QUEST_LOG.MD</h2>
+                <div class="projects-grid">
+                    <div class="project-card fade-in">
+                        <div class="project-header">
+                            <div class="project-title">Nature Journal</div>
+                            <div class="project-tags">
+                                <span class="tag">React</span>
+                                <span class="tag">Design</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <p class="project-description">A digital journal app for tracking hikes and nature observations, featuring watercolor-inspired illustrations and offline support.</p>
+                            <a href="#" class="project-link">View Project →</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card fade-in">
+                        <div class="project-header">
+                            <div class="project-title">Pixel Garden</div>
+                            <div class="project-tags">
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">Game</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <p class="project-description">A relaxing virtual garden where you can plant and nurture pixel art flowers. Built as a meditation tool with gentle animations.</p>
+                            <a href="#" class="project-link">View Project →</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card fade-in">
+                        <div class="project-header">
+                            <div class="project-title">Vintage Weather</div>
+                            <div class="project-tags">
+                                <span class="tag">API</span>
+                                <span class="tag">Design</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <p class="project-description">Weather forecasting with a retro RPG interface. Features 8-bit weather icons and nostalgic sound effects.</p>
+                            <a href="#" class="project-link">View Project →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact">
+            <div class="section-content">
+                <h2>SEND_MESSAGE.EXE</h2>
+                <form onsubmit="handleSubmit(event)">
+                    <div class="form-group fade-in">
+                        <label for="name">NAME</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group fade-in">
+                        <label for="email">EMAIL</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group fade-in">
+                        <label for="message">MESSAGE</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn fade-in">SEND</button>
+                </form>
+
+                <div class="social-links fade-in">
+                    <a href="#" class="social-link" title="GitHub">GH</a>
+                    <a href="#" class="social-link" title="LinkedIn">LI</a>
+                    <a href="#" class="social-link" title="Twitter">TW</a>
+                    <a href="#" class="social-link" title="Dribbble">DR</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 YOUR NAME • CRAFTED WITH CARE</p>
+        </footer>
+    </div>
+
+    <script>
+        // Clock functionality
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Ambience screen controls
+        function hideAmbience() {
+            document.getElementById('ambience-screen').classList.add('hidden');
+        }
+
+        function showAmbience() {
+            document.getElementById('ambience-screen').classList.remove('hidden');
+        }
+
+        // Form submission
+        function handleSubmit(event) {
+            event.preventDefault();
+            alert('Message sent! (This is a demo - connect to your backend)');
+            event.target.reset();
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
